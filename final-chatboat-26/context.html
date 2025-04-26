@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Chat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+
+    #chat-box {
+      border: 1px solid #ccc;
+      padding: 20px;
+      height: 300px;
+      overflow-y: auto;
+      background: white;
+      margin-bottom: 20px;
+    }
+
+    .bot-response {
+      font-weight: normal;
+      margin-top: 10px;
+    }
+
+    .user-prompt {
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    #input-area {
+      display: flex;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>AI Chat</h1>
+  <div id="chat-box"></div>
+
+  <div id="input-area">
+    <input type="text" id="userInput" placeholder="Ask me something..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <script>
+    const chatBox = document.getElementById("chat-box");
+    const userInputEl = document.getElementById("userInput");
+
+    const timeoutRefs = [];
+    const history = [];
+
+    function clearTimeouts() {
+      timeoutRefs.forEach(clearTimeout);
+    }
+
+    function delayDisplay(index, word, container) {
+      const timeoutId = setTimeout(() => {
+        container.innerHTML += word + " ";
+      }, 75 * index);
+      timeoutRefs.push(timeoutId);
+    }
+
+    async function runChat(prompt) {
+      // This simulates a response, replace this with real API call
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve("This is **bold** and *a new line*");
+        }, 500);
+      });
+    }
+
+    async function sendMessage() {
+      const input = userInputEl.value.trim();
+      if (!input) return;
+
+      const userDiv = document.createElement("div");
+      userDiv.className = "user-prompt";
+      userDiv.textContent = input;
+      chatBox.appendChild(userDiv);
+
+      const responseDiv = document.createElement("div");
+      responseDiv.className = "bot-response";
+      chatBox.appendChild(responseDiv);
+
+      userInputEl.value = "";
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      clearTimeouts();
+
+      const response = await runChat(input);
+
+      let newResponse = "";
+      let responseArray = response.split("**");
+      for (let i = 0; i < responseArray.length; i++) {
+        if (i === 0 || i % 2 !== 1) {
+          newResponse += responseArray[i];
+        } else {
+          newResponse += "<b>" + responseArray[i] + "</b>";
+        }
+      }
+
+      let formatted = newResponse.split("*").join("<br/>");
+      const words = formatted.split(" ");
+
+      responseDiv.innerHTML = "";
+      words.forEach((word, i) => delayDisplay(i, word, responseDiv));
+
+      history.push({ prompt: input, response });
+    }
+  </script>
+
+</body>
+</html>
